@@ -66,6 +66,10 @@ public class IndexView extends TextView {
 
     private Runnable hideTipRunnable;
 
+    private int listSize;
+
+
+
     public IndexView(Context context, AttributeSet attrs, int defStyle) {
 
         super(context, attrs, defStyle);
@@ -144,19 +148,43 @@ public class IndexView extends TextView {
         if(widthMode != MeasureSpec.EXACTLY){
             width = Math.min(DEFAULT_WIDTH, width);
         }
-        singleIndexHeight = height * heightOccupy / INDEXES.length();
+        singleIndexHeight = height * heightOccupy / getListSize();
         indexTextSize = Math.min(singleIndexHeight, width) * indexTextSizeScale;
         indexTextPaint.setTextSize(indexTextSize);
         selectIndexTextPaint.setTextSize(indexTextSize);
         setMeasuredDimension(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
     }
 
+//    @Override
+//    protected void onDraw(Canvas canvas) {
+//
+//        super.onDraw(canvas);
+//        float singleIndexWidth = getMeasuredWidth();
+//        for (int i = 0; i < INDEXES.length(); i++) {
+//
+//            float x = (singleIndexWidth - indexTextPaint.measureText(INDEXES, i, i + 1)) / 2;
+//            float baseline = (1 - heightOccupy) / 2.0f * height + i * singleIndexHeight + Util.getBaseline(0, singleIndexHeight, indexTextPaint);
+//
+//            if(i == selectIndex){
+//                float left = 0.1f * singleIndexWidth;
+//                float top = (1 - heightOccupy) / 2.0f * height + i * singleIndexHeight + 0.05f * singleIndexHeight;
+//                float
+// right = 0.9f * singleIndexWidth;
+//                float bottom = (1 - heightOccupy) / 2.0f * height + i * singleIndexHeight + 0.95f * singleIndexHeight;
+//                canvas.drawRoundRect(new RectF(left, top, right, bottom), 5, 5, selectIndexBgPaint);
+//                canvas.drawText(String.valueOf(INDEXES.charAt(i)), x, baseline, selectIndexTextPaint);
+//            }else{
+//                canvas.drawText(String.valueOf(INDEXES.charAt(i)), x, baseline, indexTextPaint);
+//            }
+//        }
+//    }
+
     @Override
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
         float singleIndexWidth = getMeasuredWidth();
-        for (int i = 0; i < INDEXES.length(); i++) {
+        for (int i = 0; i < getListSize(); i++) {
 
             float x = (singleIndexWidth - indexTextPaint.measureText(INDEXES, i, i + 1)) / 2;
             float baseline = (1 - heightOccupy) / 2.0f * height + i * singleIndexHeight + Util.getBaseline(0, singleIndexHeight, indexTextPaint);
@@ -167,9 +195,9 @@ public class IndexView extends TextView {
                 float right = 0.9f * singleIndexWidth;
                 float bottom = (1 - heightOccupy) / 2.0f * height + i * singleIndexHeight + 0.95f * singleIndexHeight;
                 canvas.drawRoundRect(new RectF(left, top, right, bottom), 5, 5, selectIndexBgPaint);
-                canvas.drawText(String.valueOf(INDEXES.charAt(i)), x, baseline, selectIndexTextPaint);
+                canvas.drawText(String.valueOf(i), x, baseline, selectIndexTextPaint);
             }else{
-                canvas.drawText(String.valueOf(INDEXES.charAt(i)), x, baseline, indexTextPaint);
+                canvas.drawText(String.valueOf(i), x, baseline, indexTextPaint);
             }
         }
     }
@@ -191,7 +219,7 @@ public class IndexView extends TextView {
         int newSelectIndex = getSelectByY(y);
         if (selectIndex != newSelectIndex && onIndexChangeListener != null) {
             onIndexChangeListener.OnIndexChange(newSelectIndex, INDEXES.charAt(newSelectIndex));
-            tip.setText(String.valueOf(INDEXES.charAt(newSelectIndex)));
+            tip.setText(String.valueOf(newSelectIndex));
             if (!tipVisible) {
                 tipVisible = true;
                 tip.setVisibility(VISIBLE);
@@ -201,12 +229,22 @@ public class IndexView extends TextView {
         return true;
     }
 
+//    private int getSelectByY(float y) {
+//        int select = (int) ((y - (1 - heightOccupy) / 2.0f * height) / singleIndexHeight);
+//        if(select < 0)
+//            return 0;
+//        if(select > INDEXES.length() - 1){
+//            return INDEXES.length() - 1;
+//        }
+//        return select;
+//    }
+
     private int getSelectByY(float y) {
         int select = (int) ((y - (1 - heightOccupy) / 2.0f * height) / singleIndexHeight);
         if(select < 0)
             return 0;
-        if(select > INDEXES.length() - 1){
-            return INDEXES.length() - 1;
+        if(select > getListSize() - 1){
+            return getListSize() - 1;
         }
         return select;
     }
@@ -228,12 +266,17 @@ public class IndexView extends TextView {
         this.onIndexChangeListener = onIndexChangeListener;
     }
 
-    protected void setIndex(char index){
-        if(index >= 'A' && index <= 'Z'){
-            selectIndex = index - 'A';
-        }else if(index == '#'){
-            selectIndex = index - 'Z' + 1;
-        }
+//    protected void setIndex(char index){
+//        if(index >= 'A' && index <= 'Z'){
+//            selectIndex = index - 'A';
+//        }else if(index == '#'){
+//            selectIndex = index - 'Z' + 1;
+//        }
+//        invalidate();
+//    }
+
+    protected void setIndex(int index){
+        selectIndex = index;
         invalidate();
     }
 
@@ -242,4 +285,12 @@ public class IndexView extends TextView {
         invalidate();
     }
 
+
+    public int getListSize() {
+        return listSize;
+    }
+
+    public void setListSize(int listSize) {
+        this.listSize = listSize;
+    }
 }
